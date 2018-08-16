@@ -6,6 +6,7 @@ import numpy as np
 from functools import reduce
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_random_state
+from .image import load_crop_img
 
 
 def list_files(path):
@@ -273,6 +274,74 @@ class ImageClassificationDataset(ImageDataset):
         if self._encode_classes:
             y = np.array([self._class_map[_y] for _y in y])
         return x, y
+
+    @staticmethod
+    def load_crops(files, crop_size, y=None, load_min_size=None, load_max_size=None, grayscale=False, crops_per_image=1,
+                   random=True, random_state=None):
+        """Load crops for all images. Crop are squared of size crop_size, and are taken in the image.
+
+        Parameters
+        ----------
+
+        files: iterable
+            The path oz the files
+        crop_size: int
+            The size of the square crop
+        y: None
+            Output vector, for it to be updated if several are taken per image
+        load_min_size:  int
+            Minimum loading size for smallest side of the image (>= crop_size)
+        load_max_size: int
+            Maximum loading size for smallest side of the image (>= load_min_size)
+        grayscale: bool
+            True for loading as a grayscale
+        crops_per_image: int
+            Number of crops to extract per image
+        random: bool
+            True for extracting crop at a random location in the image
+        random_state: RandomState, int, None
+
+        Returns
+        -------
+        images: ndarray
+            The array of crops
+        y: ndarray
+            If y is None, indices of the original input image for each crop.
+            Otherwise, the class corresponding to initial image for each crop.
+        """
+        random_state = check_random_state(random_state)
+
+        # init ndarray
+        n_images = len(files)
+        images = np.zeros([
+            n_images * crops_per_image,
+            crop_size, crop_size,
+            3 if not grayscale else 1
+        ], dtype=np.uint8)
+
+        # generate crops
+        for i, filename in enumerate(filenames):
+            for j in range(crops_per_image):
+                # determine load size
+                if load_max_size is None or load_min_size is None:
+                    load_size = random_state.randint(load_size_range[0], load_size_range[1] + 1)
+                else:
+                    load_size = crop_size
+
+                # load crop
+                images[i * crops_per_image + j, :, :, :] = load_crop_img(
+                    filename,
+                    load_size=load_size,
+                    crop_size=crop_size,
+                    grayscale=grayscale,
+                    random=random,
+                    random_state=random_state
+                )
+
+        # output
+        if y is None:
+            y = np.arange(n_images)
+        return images, np.repeat(y, crops_per_image)
 
 
 class ImageSegmentationDataset(ImageDataset):
