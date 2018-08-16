@@ -1,7 +1,7 @@
 # image_datasets
 
 Provide easy access to images in a dataset. For now support classification and segmentation datasets.
-The lib assumes the following structure for the dataset files (explained below). 
+The lib assumes a certain structure for the dataset files (explained below). 
 
 ## Directory structures
 * For segmentation: 
