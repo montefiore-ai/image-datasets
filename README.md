@@ -90,3 +90,39 @@ dataset = ImageClassificationDataset("~/my_dataset", dirs=["train", "test"])
 x_train, y_train = dataset.all(dirs=["train"], one_hot=False)
 images_train = ImageDataset.load_images(x_train)
 ```
+
+### Function `ImageClassificationDataset.load_crops`
+
+Load one or several crops from all given images.
+
+* `files`: The path of the files
+* `crop_size`: The size of the square crop
+* `y`: Output vector, for it to be updated if several are taken per image
+* `load_min_size`:  Minimum loading size for smallest side of the image (`>= crop_size`)
+* `load_max_size`: Maximum loading size for smallest side of the image (`>= load_min_size`)
+* `grayscale`: `True` for loading as a grayscale
+* `crops_per_image`: Number of crops to extract per image
+* `random`: `True` for extracting crop at a random location in the image
+* `random_state`: Random state
+
+```python
+dataset = ImageClassificationDataset("~/my_dataset", dirs=["train", "test"])
+x_train, y_train = dataset.all(dirs=["train"], one_hot=False)
+
+# for taking 10 random crops per image, each crops taken as between 50% and 100% of the image
+crops_train, crops_y = ImageClassificationDataset.load_images(
+    x_train, crop_size=224,
+    load_size_min=224,
+    load_size_max=448
+    y=y_train,
+    crops_per_image=10,
+    random=True,
+    random_state=42
+)
+
+# for taking one maximum centered random crop per image
+crops_train_2, crops_y_2 = ImageClassificationDataset.load_images(
+    x_train, crop_size=224,
+    y=y_train, random=False
+)
+```
