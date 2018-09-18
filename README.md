@@ -1,7 +1,8 @@
 # image_datasets
 
-Provide easy access to images in a dataset. For now support classification and segmentation datasets.
-The lib assumes a certain structure for the dataset files (explained below). 
+The Python library provides easy access to images in a dataset. It is an alternative when you don't work with PyTorch or Keras (or whatever) but you still want to load a dataset as it provides basic functionnalities with minimal requirements and dependencies.
+
+For now support classification and segmentation datasets. The lib assumes a certain structure for the dataset files (explained below). 
 
 ## Directory structures
 * For segmentation: 
